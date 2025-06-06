@@ -1,0 +1,46 @@
+# UART Receive Interrupt with FreeRTOS – Zybo Board
+
+Introduction
+This project demonstrates UART receive interrupt handling using FreeRTOS on the Zybo Zynq-7000 board. It captures characters received over UART using a custom interrupt service routine (ISR), buffers them, and optionally processes them in a FreeRTOS task—enabling non-blocking and responsive communication.
+
+
+Build Instructions:
+
+Build the ELF Binary
+1. Open a terminal and navigate to the project:
+
+   cd <project_root>
+   make
+
+2.Troubleshooting:
+   If linking errors appear (e.g., `-lxil`, `-lfreertos` not found), ensure the Makefile or linker script includes the correct library paths pointing to the BSP or platform libraries.
+
+Application Deployment:
+
+1.Load the ELF onto Zybo
+You can use Vitis or XSD to load the compiled ELF
+
+2.Connect to the UART Console
+
+Connect your PC to the Zybo board using the USB-UART interface and open a serial terminal (e.g., **Tera Term**, **minicom**, **PuTTY**) with the following settings:
+
+3.Trigger UART RX Interrupt
+
+ Type any character in the UART terminal.
+ The character is not echoed back, but it is stored in the RX buffer.
+ Confirms:
+  * RX interrupt is triggered.
+  * Custom ISR is executed.
+
+
+4.UART Interrupt Handling Flow
+When a character is received:
+
+1. UART RX interrupt is triggered.
+2. The ISR runs and reads the character from the RX buffer.
+
+Example Output
+
+uart custom isr handler is called
+ISR Received: o
+interrupt is cleared
