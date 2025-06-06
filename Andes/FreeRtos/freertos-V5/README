@@ -1,0 +1,162 @@
+Getting Started with Andes V5 FreeRTOS package
+===========================================
+
+The Andes V5 FreeRTOS package is a FreeRTOS demo application that targets a NDS V5
+32-bit/64-bit core on Andes V5 platforms. It contain all files necessary for Andes
+platform to build the FreeRTOS application, including FreeRTOS Andes V5 kernel port
+and standard FreeRTOS demo application. The directories of the package are standard
+FreeRTOS source organization which are organized as follows:
+
+ * README    - This file.
+ * Source/   - The directory contains the FreeRTOS kernel source code for Andes V5 port.
+ * Demo/     - The directory contains the demo application source code.
+
+
+The structure of the FreeRTOS/Source directory is shown below:
+
+  Source/                  The core FreeRTOS kernel files
+        |
+        +-include          The core FreeRTOS kernel header files
+        |
+        +-Portable
+            |
+            +-GCC
+                |
+                +-RISCV    The Andes V5 port supported
+            +-MemMang      The sample heap implementations
+
+
+The structure of the FreeRTOS/Demo directory is shown below:
+
+  Demo/
+        |
+        +-Common           The demo application files that are used by all the demos.
+        |
+        +-V5               The demo application build files for Andes V5 PLIC based platform
+        |   |
+        |   +-RTOSDemo     Contains the C files specific to the demo
+        |   +-RTOSDemo_bsp Contains the PLIC hardware board support package
+        |
+        +-V5-CLIC          The demo application build files for Andes V5 CLIC based platform
+            |
+            +-RTOSDemo     Contains the C files specific to the demo
+            +-RTOSDemo_bsp Contains the CLIC hardware board support package
+
+
+This package is used for targeting Andes V5 CPU based platforms using the
+RV32/RV64 baseline compiler. The following AndesStar architectures are
+supported:
+
+ - V5 : N22 / N25 / N25F / D25F / A25 / NX25 / NX25F / AX25
+
+
+Requirements
+============
+To start using Andes V5 FreeRTOS package, you will need the following:
+
+ - The Andes V5 RV32/RV64 toolchain to compile Andes V5 FreeRTOS package.
+ - Andes platform (AE250/AE350).
+ - ICEman utility to download the image to platform.
+
+
+Demo application
+================
+
+There are two standard FreeRTOS demo applications are implemented in the package.
+One is simply Blinky style demo (Blinky demo) and the other is more comprehensive
+test demo (Full demo).
+
+Functionality
+-------------
+
+The constant 'mainSELECTED_APPLICATION', which is #defined at the top of main.c,
+is used to switch between the simply Blinky style demo and the more comprehensive
+test and demo application.
+
+* Functionality with mainSELECTED_APPLICATION set to '0'
+
+  If mainSELECTED_APPLICATION is set to 0 then main() will call main_blinky(),
+  which is implemented in main_blinky.c.
+
+  The main_blinky() creates a very simple demo that includes two tasks, one software
+  timer and one queue. One task and one software timer use the queue to repeatedly
+  send the value 100 and 200 to the queue receiving task. The queue send task writes
+  to the queue every 200ms and software timer writes to the queue every 2s. The receiving
+  task prints a message to the UART port each time the message is received.
+
+* Functionality with mainSELECTED_APPLICATION set to '1'
+
+  If mainSELECTED_APPLICATION is set to 1 then main() will call main_full(),
+  which is implemented in main_full.c.
+
+  The main_full() creates a comprehensive application that tests the RTOS port and
+  demonstrates:
+  - RTOS objects being created using both statically and dynamically allocated memory.
+  - Direct to task notifications.
+  - Event groups.
+  - Software timers.
+  - Queues.
+  - Semaphores.
+  - Mutexes.
+
+  Most of the tasks created by the demo are from the set of standard demo tasks. These
+  are used by all FreeRTOS demo applications, and have no specific functionality or
+  purpose other than to demonstrate the FreeRTOS API being used, and test the RTOS port.
+
+  The following tasks are created in addition to the standard demo tasks:
+
+  * Register test tasks
+
+    The register test tasks test the RTOS context switch mechanism by first filling each
+    Andes V5 register (including the floating point registers) with a known and unique
+    value, then repeatedly checking that the value originally written to the register remains
+    in the register for the lifetime of the task. The nature of these tasks necessitates
+    that they are written in assembly.
+
+  * A 'check' task
+
+    The check task periodically (5 seconds) queries the standard demo tasks, and the register
+    test tasks, to ensure they are functioning as intended - then prints a status message
+    to the UART port.
+
+
+Building the demo application
+=============================
+
+Enter the "Demo/V5" or "Demo/V5-CLIC" directory as the root directory. Open the 'main.c' file
+in 'RTOSDemo' folder, and set 'mainSELECTED_APPLICATION' to generate the simple blinky demo,
+the full test and demo application or the simple two tasks demo, as required. Then next, execute
+the make command with specifying the 'COMPILER' and 'PLAT' to select the 32-bit or 64-bit
+toolcchain and platform to perform the building process. The help warning message will show
+up if 'COMPILER' make variable is not specified. If 'PLAT' is not specified, the 'PLAT=AE250'
+is selected as default.
+
+ # make COMPILER=[riscv32|riscv64|riscv32-llvm|riscv64-llvm] [PLAT=[AE250|AE350|CF1-AE250]]
+
+   - COMPILER=[riscv32|riscv64|riscv32-llvm|riscv64-llvm]         : Select 32-bit/64-bit GCC/LLVM toolchain to build
+   - PLAT=[AE250|AE350|CF1-AE250]                                 : Select platform to build
+
+The silence building is automatically selected as default. If you want to turn on verbose
+builds, you can set 'V=1' in make command to enable.
+Such as :
+
+ # make COMPILER=riscv32 V=1
+
+Building with configured
+------------------------
+The deafult image to build is for non-cache and non-debugging based system. Additionally,
+you can use the following make variables to specify the system configures to build.
+
+ - DEBUG=1         : Enable debug configure
+ - USE_CACHE=1     : Enable cache configure.
+ - USE_HWDSP=1     : Enable DSP extension supporting
+
+The make variables can be single or multiple set when make. For example, building for
+debugging and cache mode enabled with verbose turned on.
+
+ # make COMPILER=riscv32 V=1 DEBUG=1 USE_CACHE=1
+
+Built images
+------------
+If nothing goes wrong, the 'Demo.elf' will be created in the root directory. The built
+images are available in there, including ELF, binary and objdump files.

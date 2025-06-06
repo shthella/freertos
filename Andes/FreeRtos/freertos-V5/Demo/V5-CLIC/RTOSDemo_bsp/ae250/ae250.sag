@@ -1,0 +1,47 @@
+USER_SECTIONS	.bootloader
+USER_SECTIONS	.loader
+USER_SECTIONS	.vector_table
+USER_SECTIONS	.data.pma
+
+HEAD 0x00000000
+{
+	BOOTLOADER 0x80000000
+	{
+		ADDR __flash_start
+		* KEEP (.bootloader)
+	}
+}
+
+LDSECTION +0 ALIGN 8 ;
+{
+	LOADER 0x0007FF00
+	{
+		LOADADDR NEXT __loader_lmastart
+		ADDR NEXT __loader_start
+		* KEEP (.loader)
+		LOADADDR __loader_lmaend
+	}
+}
+
+MEM +0 ALIGN 256 0x00080000 ; max_size=512K
+{
+	EILM 0x00000000
+	{
+		LOADADDR NEXT __text_lmastart
+		ADDR NEXT __text_start
+		* (.vector_table)
+		* (+ISR,+RO)
+		LOADADDR __text_lmaend
+	}
+
+	EDLM 0x00200000
+	{
+		LOADADDR NEXT __data_lmastart
+		ADDR NEXT __data_start
+		* (.data.pma LMA_FORCE_ALIGN(256))
+		* (+RW)
+		LOADADDR __data_lmaend
+		* (+ZI)
+		STACK = 0x00280000
+	}
+}

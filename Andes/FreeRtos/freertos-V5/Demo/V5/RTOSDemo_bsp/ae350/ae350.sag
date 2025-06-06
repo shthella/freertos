@@ -1,0 +1,37 @@
+USER_SECTIONS	.bootloader
+USER_SECTIONS	.loader
+USER_SECTIONS	.vector_table
+USER_SECTIONS	.data.pma
+
+HEAD 0x00000000
+{
+	BOOTLOADER 0x80000000
+	{
+		ADDR __flash_start
+		* KEEP (.bootloader)
+	}
+}
+
+LDSECTION +0 ALIGN 8
+{
+	LOADER 0x0007FF00
+	{
+		LOADADDR NEXT __loader_lmastart
+		ADDR NEXT __loader_start
+		* KEEP (.loader)
+		LOADADDR __loader_lmaend
+	}
+}
+
+MEM +0 ALIGN 4096
+{
+	RAM 0x00000000
+	{
+		LOADADDR NEXT __text_lmastart
+		ADDR NEXT __text_start
+		* (.data.pma)
+		* (.vector_table)
+		* (+ISR,+RO,+RW,+ZI)
+		STACK = 0x08000000
+	}
+}
