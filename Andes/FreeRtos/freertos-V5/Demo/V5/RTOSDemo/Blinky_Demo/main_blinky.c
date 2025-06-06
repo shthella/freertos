@@ -126,24 +126,6 @@ static TimerHandle_t xTimer = NULL;
 /*-----------------------------------------------------------*/
 
 
-void vTaskFunction1(void *pvParameters)
-{
-    while (1)
-    {
-        printf( "Hello_from_FreerTOS_Task1!\r\n");
-        vTaskDelay(pdMS_TO_TICKS(500)); // Delay for 1 second
-    }
-}
-
-
-void vTaskFunction(void *pvParameters)
-{
-    while (1)
-    {
-        printf( "Hello from FreerTOS Task!\r\n");
-        vTaskDelay(pdMS_TO_TICKS(500)); // Delay for 1 second
-    }
-}
 
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
 void main_blinky( void )
@@ -151,7 +133,6 @@ void main_blinky( void )
 const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
 	printf( "Blinky Demo\n" );
-	printf( "pavan \n");
 
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
